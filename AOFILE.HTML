@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Submission Tracker</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f7f6;
+      color: #333;
+      cursor: pointer; /* Change cursor to pointer to indicate it's clickable */
+    }
+
+    header {
+      background-color: #28a745;
+      text-align: center;
+      padding: 20px;
+      color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 28px;
+      margin: 0;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .manager-card {
+      background-color: #fff;
+      width: 300px;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      color: #333;
+    }
+
+    .manager-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    }
+
+    .manager-card h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #28a745;
+    }
+
+    .shift {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 15px;
+    }
+
+    .audit-status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .status {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .completed {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .not-completed {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .partially-completed {
+      background-color: #ff9800;
+      color: white;
+    }
+
+    .ooto-checkbox {
+      margin-left: 10px;
+      transform: scale(1.3);
+    }
+
+    .ooto-status {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 16px;
+      background-color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    footer {
+      background-color: #28a745;
+      color: white;
+      text-align: center;
+      padding: 12px;
+    }
+
+    .ooto-status input {
+      margin-left: 10px;
+      transform: scale(1.3);
+    }
+  </style>
+</head>
+<body>
+
+  <a href="https://your-link.com" style="text-decoration: none; display: block; height: 100%;">
+    <header>
+      <h1>Audit Submission Tracker</h1>
+    </header>
+
+    <div class="container">
+      <!-- Dynamic manager cards will go here -->
+    </div>
+
+    <div class="ooto-status">
+      <p>Mark any manager as OOTO this week:</p>
+      <input type="checkbox" id="ootoToggle" onchange="toggleOOTO()">
+      <label for="ootoToggle">OOTO</label>
+    </div>
+
+    <footer>
+      <p>&copy; 2025 Audit Tracker | All Rights Reserved</p>
+    </footer>
+  </a>
+
+  <script>
+    const namesWithShifts = [
+      { name: "Aldo Navea", shift: "FHD" },
+      { name: "Ornella Carvazan", shift: "FHD" },
+      { name: "Ming Situ", shift: "FHD" },
+      { name: "Frank Colwell", shift: "FHD" },
+      { name: "Jlesia Marquez", shift: "FHD" },
+      { name: "Carolina De Fifer", shift: "FHD" },
+      { name: "Paul Taglianetti", shift: "FHD" },
+      { name: "Nathaly Burgos", shift: "FHN" },
+      { name: "Zachary Heckscher", shift: "FHN" },
+      { name: "Jamora Glover", shift: "FHN" },
+      { name: "Kory Schillo", shift: "FHN" },
+      { name: "A.D. Derisca", shift: "FHN" },
+      { name: "Sebastian Bazil", shift: "FHN" },
+      { name: "Ian Salter", shift: "BHD" },
+      { name: "Carmen Villalonga", shift: "BHD" },
+      { name: "Angela Francois", shift: "BHD" },
+      { name: "Kasey Jeffries", shift: "BHD" },
+      { name: "Josh Chavez", shift: "BHD" },
+      { name: "Daisy Santiago", shift: "BHD" },
+      { name: "Sophia Scherrer", shift: "RT" },
+      { name: "Terrence McPherson", shift: "RT" },
+      { name: "Ramsey Rosario", shift: "RT" },
+      { name: "Christopher Johnson Jr", shift: "RT" },
+      { name: "Nicholas Schwarting", shift: "RT" },
+      { name: "Chris Shank", shift: "RT" },
+      { name: "Jesus Rincon", shift: "M-F" }
+    ];
+
+    const container = document.querySelector('.container');
+
+    function updateList() {
+      container.innerHTML = '';
+      namesWithShifts.forEach(entry => {
+        const card = document.createElement('div');
+        card.classList.add('manager-card');
+        card.innerHTML = `
+          <h3>${entry.name}</h3>
+          <p class="shift">Shift: ${entry.shift}</p>
+
+          <div class="audit-status">
+            <p>AO Audit:</p>
+            <span class="status not-completed" onclick="toggleStatus(this, 'ao')">Not Completed</span>
+          </div>
+
+          <div class="audit-status">
+            <p>TPS Audit:</p>
+            <span class="status not-completed" onclick="toggleTPS(this)">Not Completed</span>
+          </div>
+
+          <div>
+            <p>OOTO:</p>
+            <input type="checkbox" onclick="toggleOOTOForManager(this, '${entry.name}')">
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function toggleStatus(element, auditType) {
+      if (auditType === 'ao') {
+        if (element.classList.contains("not-completed")) {
+          element.textContent = "Completed";
+          element.classList.remove("not-completed");
+          element.classList.add("completed");
+        } else {
+          element.textContent = "Not Completed";
+          element.classList.remove("completed");
+          element.classList.add("not-completed");
+        }
+      }
+    }
+
+    function toggleTPS(element) {
+      if (element.classList.contains("not-completed")) {
+        element.textContent = "1/2 (Partially Completed)";
+        element.classList.remove("not-completed");
+        element.classList.add("partially-completed");
+      } else if (element.classList.contains("partially-completed")) {
+        element.textContent = "2/2 (Completed)";
+        element.classList.remove("partially-completed");
+        element.classList.add("completed");
+      } else {
+        element.textContent = "Not Completed";
+        element.classList.remove("completed");
+        element.classList.add("not-completed");
+      }
+    }
+
+    function toggleOOTOForManager(checkbox, managerName) {
+      const items = document.querySelectorAll('.manager-card');
+
+      items.forEach(item => {
+        const managerNameElement = item.querySelector('h3');
+        
+        if (managerNameElement.textContent === managerName) {
+          const aoStatus = item.querySelector('.status');
+          const tpsStatus = item.querySelectorAll('.status')[1];
+
+          if (checkbox.checked) {
+            aoStatus.textContent = "OOTO";
+            aoStatus.classList.add("not-completed");
+            aoStatus.classList.remove("completed");
+            
+            tpsStatus.textContent = "OOTO";
+            tpsStatus.classList.add("not-completed");
+            tpsStatus.classList.remove("completed");
+          } else {
+            aoStatus.textContent = "Not Completed";
+            aoStatus.classList.add("not-completed");
+            aoStatus.classList.remove("completed");
+
+            tpsStatus.textContent = "Not Completed";
+            tpsStatus.classList.add("not-completed");
+            tpsStatus.classList.remove("completed");
+          }
+        }
+      });
+    }
+
+    function toggleOOTO() {
+      const checkbox = document.getElementById('ootoToggle');
+      const items = document.querySelectorAll('.manager-card');
+
+      items.forEach(item => {
+        const aoStatus = item.querySelector('.status');
+        const tpsStatus = item.querySelectorAll('.status')[1];
+
+        if (checkbox.checked) {
+          aoStatus.textContent = "OOTO";
+          aoStatus.classList.add("not-completed");
+          aoStatus.classList.remove("completed");
+          
+          tpsStatus.textContent = "OOTO";
+          tpsStatus.classList.add("not-completed");
+          tpsStatus.classList.remove("completed");
+        } else {
+          aoStatus.textContent = "Not Completed";
+          aoStatus.classList.add("not-completed");
+          aoStatus.classList.remove("completed");
+
+          tpsStatus.textContent = "Not Completed";
+          tpsStatus.classList.add("not-completed");
+          tpsStatus.classList.remove("completed");
+        }
+      });
+    }
+
+    // Initial load of the list
+    updateList();
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
